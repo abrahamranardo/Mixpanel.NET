@@ -3,7 +3,7 @@ using System.Web.Script.Serialization;
 
 namespace Mixpanel.NET.Engage {
   public class MixpanelEngage : MixpanelClientBase, IEngage {
-    private readonly EngageOptions _options;
+      private readonly EngageOptions _options;
 
     /// <summary>
     /// Creates a new Mixpanel Engage client for a given API token
@@ -21,7 +21,9 @@ namespace Mixpanel.NET.Engage {
     }
 
     private bool Engage(string distinctId, IDictionary<string, object> setProperties = null,
-      IDictionary<string, object> incrementProperties = null, bool delete = false, string ip = null) {
+        IDictionary<string,object> setOnceProperties = null, IDictionary<string, object> incrementProperties = null, 
+        IDictionary<string, object> appendProperties = null, IDictionary<string, object> transactionProperties = null,
+        bool delete = false, string ip = null) {
       // Standardize token and time values for Mixpanel
       var dictionary = 
         new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
@@ -30,7 +32,15 @@ namespace Mixpanel.NET.Engage {
 
       if (setProperties != null) dictionary.Add("$set", setProperties.FormatProperties());
 
-      if (incrementProperties != null) dictionary.Add("$add", incrementProperties.FormatProperties());
+      if (setOnceProperties != null) dictionary.Add("$set_once", setProperties);
+
+      if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
+
+      if (appendProperties != null)
+      {
+          if (transactionProperties != null) appendProperties.Add("$transactions", transactionProperties);
+          dictionary.Add("$append", appendProperties);
+      }
 
       if (delete) dictionary.Add("$delete", string.Empty);
 
@@ -45,7 +55,7 @@ namespace Mixpanel.NET.Engage {
       return contents == "1";
     }
 
-      public bool Delete(string distinctId) {
+    public bool Delete(string distinctId) {
       return Engage(distinctId, delete: true);
     }
 
@@ -53,9 +63,19 @@ namespace Mixpanel.NET.Engage {
       return Engage(distinctId, setProperties, ip: ip);
     }
 
-    public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null) {
+    public bool SetOnce(string distictId, IDictionary<string, object> setOnceProperties, string ip = null)
+    {
+      return Engage(distictId, setOnceProperties, ip: ip);
+    }
+
+    public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null)
+    {
       return Engage(distinctId, incrementProperties: incrementProperties, ip: ip);
     }
 
+    public bool Append(string distinctId, IDictionary<string, object> appendProperties, IDictionary<string, object> transactionProperties, string ip = null)
+    {
+      return Engage(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties, ip: ip);
+    }
   }
 }
