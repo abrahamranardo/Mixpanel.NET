@@ -32,7 +32,7 @@ namespace Mixpanel.NET.Engage {
 
       if (setProperties != null) dictionary.Add("$set", setProperties.FormatProperties());
 
-      if (setOnceProperties != null) dictionary.Add("$set_once", setProperties);
+      if (setOnceProperties != null) dictionary.Add("$set_once", setOnceProperties);
 
       if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
 
