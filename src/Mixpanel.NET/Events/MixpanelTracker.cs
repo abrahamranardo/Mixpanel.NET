@@ -25,7 +25,22 @@ namespace Mixpanel.NET.Events
             _options = options ?? new TrackerOptions();
         }
 
-        public bool Track(string @event, IDictionary<string, object> properties)
+        public bool Flush()
+        {
+            var data = new JavaScriptSerializer().Serialize(batch);
+
+            var values = "data=" + data.Base64Encode();
+            if (_options.Test) values += "&test=1";
+
+            // For send a batch, we need to use Post method
+            var contents = http.Post(Resources.Track(_options.ProxyUrl), values);
+
+            batch.Clear();
+
+            return contents == "1";
+        }
+
+        public Dictionary<string, object> PrepareData(string @event, IDictionary<string, object> properties)
         {
             var propertyBag = properties.FormatProperties();
             // Standardize token and time values for Mixpanel
@@ -34,11 +49,16 @@ namespace Mixpanel.NET.Events
             if (_options.SetEventTime && !properties.Keys.Any(x => x.ToLower() == "time"))
                 propertyBag["time"] = DateTime.UtcNow.FormatDate();
 
-            var data = new JavaScriptSerializer().Serialize(new Dictionary<string, object>
+            return new Dictionary<string, object>
             {
                 { "event", @event },
                 { "properties", propertyBag }
-            });
+            };
+        }
+
+        public bool Track(string @event, IDictionary<string, object> properties)
+        {
+            var data = new JavaScriptSerializer().Serialize(PrepareData(@event, properties));
 
             var values = "data=" + data.Base64Encode();
 
@@ -59,6 +79,22 @@ namespace Mixpanel.NET.Events
         public bool Track<T>(T @event)
         {
             return Track(@event.ToMixpanelEvent(_options.LiteralSerialization));
+        }
+
+        public bool AddBatch(string @event, IDictionary<string, object> properties, bool autoFlush = true)
+        {
+            if (batch == null)
+                batch = new List<Dictionary<string, object>>();
+
+            batch.Add(PrepareData(@event, properties));
+
+            // There's a limitation 50 events for each request
+            if (batch.Count() == 50)
+            {
+                return Flush();
+            }
+
+            return true;
         }
     }
 }
