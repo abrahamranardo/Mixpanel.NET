@@ -81,7 +81,7 @@ namespace Mixpanel.NET.Events
             return Track(@event.ToMixpanelEvent(_options.LiteralSerialization));
         }
 
-        public bool AddBatch(string @event, IDictionary<string, object> properties, bool autoFlush = true)
+        public bool AddBatch(string @event, IDictionary<string, object> properties)
         {
             if (batch == null)
                 batch = new List<Dictionary<string, object>>();
