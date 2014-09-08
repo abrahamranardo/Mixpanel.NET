@@ -77,5 +77,24 @@ namespace Mixpanel.NET.Engage {
     {
       return Engage(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties, ip: ip);
     }
+
+    public bool SetAlias(string distinctId, string aliasId)
+    {
+        // Standardize token and time values for Mixpanel
+        var dictionary =
+          new Dictionary<string, object> { { "event", "$create_alias" } };
+
+        dictionary.Add("properties", new Dictionary<string, object> { { "distinct_id", distinctId }, { "alias", aliasId }, { "$token", token } });
+
+        var data = new JavaScriptSerializer().Serialize(dictionary);
+
+        var values = "data=" + data.Base64Encode();
+
+        var contents = _options.UseGet
+          ? http.Get(Resources.Engage(_options.ProxyUrl), values)
+          : http.Post(Resources.Engage(_options.ProxyUrl), values);
+
+        return contents == "1";
+    }
   }
 }
