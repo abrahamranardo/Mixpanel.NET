@@ -20,29 +20,40 @@ namespace Mixpanel.NET.Engage {
       _options = options ?? new EngageOptions();
     }
 
-    private bool Engage(string distinctId, IDictionary<string, object> setProperties = null,
-        IDictionary<string,object> setOnceProperties = null, IDictionary<string, object> incrementProperties = null, 
-        IDictionary<string, object> appendProperties = null, IDictionary<string, object> transactionProperties = null,
-        bool delete = false, string ip = null) {
+    private bool Engage(string distinctId, 
+        IDictionary<string, object> setProperties = null,
+        IDictionary<string, object> setOnceProperties = null,
+        IDictionary<string, object> incrementProperties = null,
+        IDictionary<string, object> appendProperties = null, 
+        IDictionary<string, object> transactionProperties = null,
+        bool delete = false, 
+        string ip = null) {
       // Standardize token and time values for Mixpanel
       var dictionary = 
         new Dictionary<string, object> {{"$token", token}, {"$distinct_id", distinctId}};
 
-      if (!string.IsNullOrWhiteSpace(ip)) dictionary.Add("$ip",ip);
+      if (!string.IsNullOrWhiteSpace(ip)) 
+          dictionary.Add("$ip",ip);
 
-      if (setProperties != null) dictionary.Add("$set", setProperties.FormatProperties());
+      if (setProperties != null) 
+          dictionary.Add("$set", setProperties.FormatProperties());
 
-      if (setOnceProperties != null) dictionary.Add("$set_once", setOnceProperties);
+      if (setOnceProperties != null) 
+          dictionary.Add("$set_once", setOnceProperties.FormatProperties());
 
-      if (incrementProperties != null) dictionary.Add("$add", incrementProperties);
+      if (incrementProperties != null) 
+          dictionary.Add("$add", incrementProperties.FormatProperties());
 
       if (appendProperties != null)
       {
-          if (transactionProperties != null) appendProperties.Add("$transactions", transactionProperties);
-          dictionary.Add("$append", appendProperties);
+          if (transactionProperties != null) 
+              appendProperties.Add("$transactions", transactionProperties.FormatProperties());
+
+          dictionary.Add("$append", appendProperties.FormatProperties());
       }
 
-      if (delete) dictionary.Add("$delete", string.Empty);
+      if (delete) 
+          dictionary.Add("$delete", string.Empty);
 
       var data = new JavaScriptSerializer().Serialize(dictionary);
 
