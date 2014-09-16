@@ -76,7 +76,7 @@ namespace Mixpanel.NET.Engage {
 
     public bool SetOnce(string distictId, IDictionary<string, object> setOnceProperties, string ip = null)
     {
-      return Engage(distictId, setOnceProperties, ip: ip);
+      return Engage(distictId, setOnceProperties: setOnceProperties, ip: ip);
     }
 
     public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null)
