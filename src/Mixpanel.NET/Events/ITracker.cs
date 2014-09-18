@@ -6,5 +6,6 @@ namespace Mixpanel.NET.Events
     bool Track(string @event, IDictionary<string, object> properties);
     bool Track(MixpanelEvent @event);
     bool Track<T>(T @event);
+    bool AddBatch(string @event, IDictionary<string, object> properties);
   }
 }

@@ -40,7 +40,7 @@ namespace Mixpanel.NET.Events
             return contents == "1";
         }
 
-        public Dictionary<string, object> PrepareData(string @event, IDictionary<string, object> properties)
+        private Dictionary<string, object> PrepareData(string @event, IDictionary<string, object> properties)
         {
             var propertyBag = properties.FormatProperties();
             // Standardize token and time values for Mixpanel
