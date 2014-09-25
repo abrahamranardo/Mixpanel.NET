@@ -28,7 +28,7 @@ namespace Mixpanel.NET.Engage {
             IDictionary<string, object> appendProperties = null,
             IDictionary<string, object> transactionProperties = null,
             bool delete = false, string aliasId = null,
-            string ip = null)
+            string ip = null, bool ignoreTime = false)
         {
             Dictionary<string, object> dictionary = null;
 
@@ -56,6 +56,9 @@ namespace Mixpanel.NET.Engage {
                     dictionary.Add("$append", appendProperties.FormatProperties());
                 }
 
+                if (ignoreTime)
+                    dictionary.Add("$ignore_time", "true");
+
                 if (delete)
                     dictionary.Add("$delete", string.Empty);
             }
@@ -76,13 +79,13 @@ namespace Mixpanel.NET.Engage {
             IDictionary<string, object> appendProperties = null, 
             IDictionary<string, object> transactionProperties = null,
             bool delete = false, string aliasId = null,
-            string ip = null) 
+            string ip = null, bool ignoreTime = false) 
         {
             // Standardize token and time values for Mixpanel
             var data = new JavaScriptSerializer().Serialize(
                 PrepareData(distinctId, setProperties, setOnceProperties, 
                     incrementProperties, appendProperties, transactionProperties, 
-                    delete, aliasId, ip));
+                    delete, aliasId, ip, ignoreTime));
 
             var values = "data=" + data.Base64Encode();
 
@@ -101,44 +104,44 @@ namespace Mixpanel.NET.Engage {
                 return Engage(distinctId, delete: true);
         }
 
-        public bool Set(string distinctId, IDictionary<string, object> setProperties, string ip = null, bool addToBatch = false) 
+        public bool Set(string distinctId, IDictionary<string, object> setProperties, string ip = null, bool addToBatch = false, bool ignoreTime = false) 
         {
             if(addToBatch)
-                return AddBatch(distinctId, setProperties, ip: ip);
+                return AddBatch(distinctId, setProperties, ip: ip, ignoreTime: ignoreTime);
             else
-                return Engage(distinctId, setProperties, ip: ip);
+                return Engage(distinctId, setProperties, ip: ip, ignoreTime: ignoreTime);
         }
 
-        public bool SetOnce(string distictId, IDictionary<string, object> setOnceProperties, string ip = null, bool addToBatch = false)
+        public bool SetOnce(string distictId, IDictionary<string, object> setOnceProperties, string ip = null, bool addToBatch = false, bool ignoreTime = false)
         {
             if (addToBatch)
-                return AddBatch(distictId, setOnceProperties: setOnceProperties, ip: ip);
+                return AddBatch(distictId, setOnceProperties: setOnceProperties, ip: ip, ignoreTime: ignoreTime);
             else
-                return Engage(distictId, setOnceProperties: setOnceProperties, ip: ip);
+                return Engage(distictId, setOnceProperties: setOnceProperties, ip: ip, ignoreTime: ignoreTime);
         }
 
-        public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null, bool addToBatch = false)
+        public bool Increment(string distinctId, IDictionary<string, object> incrementProperties, string ip = null, bool addToBatch = false, bool ignoreTime = false)
         {
             if(addToBatch)
-                return AddBatch(distinctId, incrementProperties: incrementProperties, ip: ip);
+                return AddBatch(distinctId, incrementProperties: incrementProperties, ip: ip, ignoreTime: ignoreTime);
             else
-                return Engage(distinctId, incrementProperties: incrementProperties, ip: ip);
+                return Engage(distinctId, incrementProperties: incrementProperties, ip: ip, ignoreTime: ignoreTime);
         }
 
-        public bool Append(string distinctId, IDictionary<string, object> appendProperties, IDictionary<string, object> transactionProperties, string ip = null, bool addToBatch = false)
+        public bool Append(string distinctId, IDictionary<string, object> appendProperties, IDictionary<string, object> transactionProperties, string ip = null, bool addToBatch = false, bool ignoreTime = false)
         {
             if(addToBatch)
-                return AddBatch(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties, ip: ip);
+                return AddBatch(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties, ip: ip, ignoreTime: ignoreTime);
             else
-                return Engage(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties, ip: ip);
+                return Engage(distinctId, appendProperties: appendProperties, transactionProperties: transactionProperties, ip: ip, ignoreTime: ignoreTime);
         }
 
-        public bool SetAlias(string distinctId, string aliasId, bool addToBatch = false)
+        public bool SetAlias(string distinctId, string aliasId, bool addToBatch = false, bool ignoreTime = false)
         {
             if (addToBatch)
-                return AddBatch(distinctId, aliasId: aliasId);
+                return AddBatch(distinctId, aliasId: aliasId, ignoreTime: ignoreTime);
             else
-                return Engage(distinctId, aliasId: aliasId);
+                return Engage(distinctId, aliasId: aliasId, ignoreTime: ignoreTime);
         }
 
         private bool AddBatch(string distinctId,
@@ -148,14 +151,14 @@ namespace Mixpanel.NET.Engage {
             IDictionary<string, object> appendProperties = null,
             IDictionary<string, object> transactionProperties = null,
             bool delete = false, string aliasId = null,
-            string ip = null)
+            string ip = null, bool ignoreTime = false)
         {
             if (batch == null)
                 batch = new List<Dictionary<string, object>>();
 
             batch.Add(PrepareData(distinctId, setProperties, setOnceProperties,
                 incrementProperties, appendProperties, transactionProperties,
-                delete, aliasId, ip));
+                delete, aliasId, ip, ignoreTime));
 
             // There's a limitation 50 events for each request
             if (batch.Count == 50)
