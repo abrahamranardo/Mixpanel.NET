@@ -45,6 +45,9 @@
     <Compile Include="Engage\IEngage.cs" />
     <Compile Include="Engage\MixpanelEngage.cs" />
     <Compile Include="Events\ITracker.cs" />
+    <Compile Include="Export\ExportOptions.cs" />
+    <Compile Include="Export\IExport.cs" />
+    <Compile Include="Export\MixpanelExport.cs" />
     <Compile Include="MixpanelClientOptions.cs" />
     <Compile Include="MixpanelClientBase.cs" />
     <Compile Include="Events\MixpanelEvent.cs" />
@@ -56,6 +59,7 @@
     <Compile Include="Events\TrackerOptions.cs" />
     <Compile Include="Events\TrackingEventBase.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

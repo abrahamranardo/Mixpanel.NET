@@ -11,7 +11,7 @@ namespace Mixpanel.NET
 
         /// <summary>
         /// If you forward events to mixpanel via a proxy you can set the URL here.  If not set
-        /// then the default value set in <see cref="Resources.MixpanelUrl"/> is used.
+        /// then the default value set in <see cref="Resources.MixpanelAPIUrl"/> is used.
         /// default: null
         /// </summary>
         public string ProxyUrl { get; set; }
